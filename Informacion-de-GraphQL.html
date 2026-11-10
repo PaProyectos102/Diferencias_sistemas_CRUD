@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GraphQL: Informe Técnico y Arquitectura</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brandGql: '#ec4899',
+            darkBg: '#0f172a'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased">
+
+  <!-- NAVBAR -->
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
+    <div class="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="/" class="w-9 h-9 rounded-lg bg-pink-500/20 border border-pink-500/40 flex items-center justify-center font-bold text-pink-400 text-lg hover:bg-pink-500/30 transition-all">
+          ←
+        </a>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-pink-400"></span>
+            <h1 class="text-base sm:text-lg font-bold text-white tracking-tight">GraphQL (Graph Query Language)</h1>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-pink-950 text-pink-400 border border-pink-800 font-semibold">Informe Técnico</span>
+          </div>
+          <p class="text-xs text-slate-400 hidden sm:block">Lenguaje declarativo de consulta para APIs y motor de ejecución en backend</p>
+        </div>
+      </div>
+
+      <!-- SWITCHER DE PROTOCOLOS -->
+      <div class="flex items-center gap-2">
+        <a href="/" class="text-xs text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-1.5 rounded-lg transition-all hidden md:flex items-center gap-1.5">
+          <span>🏠</span> Laboratorio
+        </a>
+        <a href="/Informacion-de-REST" class="text-xs text-emerald-300 hover:text-white bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-800/60 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1">
+          <span>🟢</span> REST
+        </a>
+        <a href="/Informacion-de-gRPC" class="text-xs text-blue-300 hover:text-white bg-blue-950/40 hover:bg-blue-900/50 border border-blue-800/60 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1">
+          <span>🔵</span> gRPC
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="w-full px-4 sm:px-6 lg:px-8 py-8 flex-1 space-y-8 max-w-6xl mx-auto">
+
+    <!-- HERO BANNER -->
+    <div class="bg-gradient-to-r from-pink-950/50 via-slate-900 to-slate-900 border border-pink-800/50 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+      <div class="max-w-3xl space-y-3">
+        <span class="text-xs uppercase font-bold tracking-wider text-pink-400 bg-pink-950 border border-pink-800 px-3 py-1 rounded-md inline-block">
+          Paradigma Declarativo de Grafo
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white">
+          ¿De qué trata GraphQL y para qué se usa?
+        </h2>
+        <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+          <strong>GraphQL</strong> es un lenguaje de consulta para APIs y un motor de ejecución del lado del servidor desarrollado internamente por <strong>Facebook (Meta) en 2012</strong> y liberado como código abierto en <strong>2015</strong>. Permite a los clientes solicitar exactamente la estructura y campos necesarios, recibiendo una respuesta JSON con la forma idéntica a la pedida.
+        </p>
+      </div>
+      <div class="absolute -right-6 -bottom-6 opacity-10 pointer-events-none text-9xl font-black text-pink-400">
+        GQL
+      </div>
+    </div>
+
+    <!-- SECCIÓN 1: ¿PARA QUÉ SE USA? -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+      <h3 class="text-lg font-bold text-white flex items-center gap-2">
+        <span class="text-pink-400">🎯</span> ¿Para qué se usa principalmente?
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-2">
+          <div class="text-pink-400 font-bold">1. Patrón BFF (Backend-For-Frontend)</div>
+          <p class="text-slate-400 text-xs leading-relaxed">
+            Ideal como capa intermedia entre múltiples microservicios de backend y las interfaces de usuario (web y móvil), agregando datos dispersos en una única respuesta coherente.
+          </p>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-2">
+          <div class="text-pink-400 font-bold">2. Aplicaciones Móviles y Redes Lentas</div>
+          <p class="text-slate-400 text-xs leading-relaxed">
+            Reduce drásticamente el consumo de batería y datos móviles al evitar el tráfico de propiedades innecesarias y resolver pantallas completas en un único round-trip.
+          </p>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-2">
+          <div class="text-pink-400 font-bold">3. Vistas Complejas y Heterogéneas</div>
+          <p class="text-slate-400 text-xs leading-relaxed">
+            Pantallas como feeds de redes sociales, dashboards analíticos o perfiles de usuario que combinan decenas de entidades interrelacionadas.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2: PRINCIPIOS ARQUITECTÓNICOS -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+      <h3 class="text-lg font-bold text-white flex items-center gap-2">
+        <span class="text-pink-400">🏛️</span> Principios Arquitectónicos Fundamentales
+      </h3>
+
+      <div class="space-y-4 text-sm text-slate-300">
+        <div class="border-l-2 border-pink-500 pl-4 py-1 space-y-1">
+          <span class="font-bold text-white text-base">1. Endpoint Único</span>
+          <p class="text-xs text-slate-400">
+            A diferencia de REST (que expone cientos de URIs), GraphQL canaliza todas las consultas y mutaciones hacia un único punto de entrada: típicamente <code class="text-pink-400 bg-slate-950 px-2 py-0.5 rounded">POST /graphql</code>.
+          </p>
+        </div>
+
+        <div class="border-l-2 border-pink-500 pl-4 py-1 space-y-1">
+          <span class="font-bold text-white text-base">2. Consultas Declarativas (Queries y Mutations)</span>
+          <p class="text-xs text-slate-400">
+            El cliente redacta un documento declarativo indicando exactamente qué propiedades quiere recibir. Si pide <code class="text-pink-300">{ usuario { nombre } }</code>, el servidor devolverá únicamente el nombre sin ningún campo extra.
+          </p>
+        </div>
+
+        <div class="border-l-2 border-pink-500 pl-4 py-1 space-y-1">
+          <span class="font-bold text-white text-base">3. Esquema Fuertemente Tipado (Schema SDL)</span>
+          <p class="text-xs text-slate-400">
+            El servidor expone un contrato formal definido en <strong>SDL</strong> (Schema Definition Language) con tipos escalares (<code class="text-pink-300">String</code>, <code class="text-pink-300">Int</code>, <code class="text-pink-300">Boolean</code>, <code class="text-pink-300">ID</code>) y tipos de objeto. El cliente puede validar su consulta antes de enviarla.
+          </p>
+        </div>
+
+        <div class="border-l-2 border-pink-500 pl-4 py-1 space-y-1">
+          <span class="font-bold text-white text-base">4. Resolvers Desacoplados</span>
+          <p class="text-xs text-slate-400">
+            Cada campo en el esquema está respaldado por una función resolutoria (*resolver*). El resolver de un campo puede consultar una base de datos SQL, otro llamar a una API externa y otro a una caché Redis de forma transparente.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 3: VENTAJAS Y LIMITACIONES -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- VENTAJAS -->
+      <div class="bg-slate-900 border border-pink-900/40 rounded-2xl p-6 shadow-xl space-y-4">
+        <h4 class="text-base font-bold text-pink-400 flex items-center gap-2">
+          <span>✅</span> Ventajas Técnicas
+        </h4>
+        <ul class="text-xs text-slate-300 space-y-2.5 list-disc list-inside leading-relaxed">
+          <li><strong>Cero Over-fetching:</strong> El cliente nunca recibe atributos no solicitados.</li>
+          <li><strong>Cero Under-fetching:</strong> Resuelve grafos de relaciones en una sola petición HTTP.</li>
+          <li><strong>Autodocumentación Nativa:</strong> Herramientas como GraphiQL y Apollo Studio permiten introspección en vivo.</li>
+          <li><strong>Autonomía en Front-End:</strong> Los desarrolladores de UI modifican sus pantallas sin esperar nuevos endpoints en el backend.</li>
+        </ul>
+      </div>
+
+      <!-- LIMITACIONES -->
+      <div class="bg-slate-900 border border-red-900/40 rounded-2xl p-6 shadow-xl space-y-4">
+        <h4 class="text-base font-bold text-rose-400 flex items-center gap-2">
+          <span>⚠️</span> Limitaciones Arquitectónicas
+        </h4>
+        <ul class="text-xs text-slate-300 space-y-2.5 list-disc list-inside leading-relaxed">
+          <li><strong>Caché Compleja en Red:</strong> Al enviar peticiones <code class="text-slate-200">POST</code> a un único endpoint, se anula la caché HTTP estándar de navegadores y CDNs.</li>
+          <li><strong>Sobrecarga en Base de Datos:</strong> Consultas anidadas pueden provocar el problema N+1 si no se usan librerías como <em>DataLoader</em> para batching de peticiones.</li>
+          <li><strong>Vulnerabilidad a DoS Semántico:</strong> Consultas recursivas maliciosas pueden colapsar la CPU del backend si no se implementa análisis de costo de consultas.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 4: CÓMO SE CODEARÍA PARA QUE FUNCIONE (EJEMPLO COMPLETO) -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+      <div>
+        <span class="text-[11px] uppercase tracking-wider font-bold text-pink-400">Implementación de Código</span>
+        <h3 class="text-xl font-bold text-white flex items-center gap-2 mt-1">
+          <span>💻</span> ¿Cómo se codearía una API GraphQL para que funcione?
+        </h3>
+        <p class="text-xs sm:text-sm text-slate-300 mt-1">
+          A continuación se muestra el código real y completo para implementar este servicio tanto en el <strong>Backend (Schema y Resolvers)</strong> como en el <strong>Frontend (Cliente Web)</strong>:
+        </p>
+      </div>
+
+      <!-- PASO 1: SCHEMA SDL -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-bold text-pink-400">Paso 1: Definir el Esquema Fuertemente Tipado (Schema SDL)</span>
+          <span class="text-slate-500 text-[11px]">GraphQL Schema</span>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-pink-300 overflow-x-auto">
+<pre># Definición de tipos de datos del dominio
+type Usuario {
+  id: ID!
+  nombre: String!
+  rol: String!
+}
+
+type AuthPayload {
+  token: String!
+  user: Usuario!
+}
+
+# Operaciones de Lectura
+type Query {
+  obtenerUsuario(id: ID!): Usuario
+}
+
+# Operaciones de Escritura / Mutación
+type Mutation {
+  login(usuario: String!, password: String!): AuthPayload
+}</pre>
+        </div>
+      </div>
+
+      <!-- PASO 2: RESOLVERS Y SERVIDOR BACKEND -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-bold text-emerald-400">Paso 2: Implementar los Resolvers y Servidor en Backend (Node.js / Apollo)</span>
+          <span class="text-slate-500 text-[11px]">Server Implementation</span>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-200 overflow-x-auto">
+<pre><span class="text-purple-400">import</span> { ApolloServer } <span class="text-purple-400">from</span> <span class="text-emerald-300">'@apollo/server'</span>;
+<span class="text-purple-400">import</span> { startStandaloneServer } <span class="text-purple-400">from</span> <span class="text-emerald-300">'@apollo/server/standalone'</span>;
+
+<span class="text-slate-500">// Mapeo de resolvers a funciones concretas</span>
+<span class="text-blue-400">const</span> resolvers = {
+  Query: {
+    <span class="text-yellow-300">obtenerUsuario</span>: (_, { id }) => ({ id, nombre: <span class="text-emerald-300">"Juan Perez"</span>, rol: <span class="text-emerald-300">"DEV_LEAD"</span> })
+  },
+  Mutation: {
+    <span class="text-yellow-300">login</span>: (_, { usuario, password }) => {
+      <span class="text-purple-400">if</span> (usuario === <span class="text-emerald-300">"admin"</span> && password === <span class="text-emerald-300">"123456"</span>) {
+        <span class="text-purple-400">return</span> {
+          token: f<span class="text-emerald-300">"jwt.gql.${usuario}.valid"</span>,
+          user: { id: <span class="text-emerald-300">"1"</span>, nombre: <span class="text-emerald-300">"Administrador Principal"</span>, rol: <span class="text-emerald-300">"ADMIN"</span> }
+        };
+      }
+      <span class="text-purple-400">throw new</span> <span class="text-yellow-300">Error</span>(<span class="text-rose-400">"Credenciales invalidas"</span>);
+    }
+  }
+};
+
+<span class="text-blue-400">const</span> server = <span class="text-blue-400">new</span> <span class="text-yellow-300">ApolloServer</span>({ typeDefs, resolvers });
+<span class="text-purple-400">const</span> { url } = <span class="text-purple-400">await</span> <span class="text-yellow-300">startStandaloneServer</span>(server, { listen: { port: 4000 } });
+console.log(<span class="text-emerald-300">`Servidor GraphQL listo en: ${url}`</span>);</pre>
+        </div>
+      </div>
+
+      <!-- PASO 3: CLIENTE FRONTEND -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-bold text-pink-400">Paso 3: Consumir la API desde el Frontend (JavaScript / Fetch)</span>
+          <span class="text-slate-500 text-[11px]">Client Implementation</span>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-200 overflow-x-auto">
+<pre><span class="text-blue-400">async function</span> <span class="text-yellow-300">autenticarUsuarioGraphQL</span>(usuario, password) {
+  <span class="text-blue-400">const</span> mutationQuery = <span class="text-emerald-300">`
+    mutation LoginUser($u: String!, $p: String!) {
+      login(usuario: $u, password: $p) {
+        token
+        user {
+          id
+          nombre
+        }
+      }
+    }
+  `</span>;
+
+  <span class="text-purple-400">try</span> {
+    <span class="text-blue-400">const</span> response = <span class="text-purple-400">await</span> <span class="text-yellow-300">fetch</span>(<span class="text-emerald-300">'/graphql'</span>, {
+      method: <span class="text-emerald-300">'POST'</span>,
+      headers: { <span class="text-emerald-300">'Content-Type'</span>: <span class="text-emerald-300">'application/json'</span> },
+      body: JSON.<span class="text-yellow-300">stringify</span>({
+        query: mutationQuery,
+        variables: { u: usuario, p: password }
+      })
+    });
+
+    <span class="text-blue-400">const</span> result = <span class="text-purple-400">await</span> response.<span class="text-yellow-300">json</span>();
+    <span class="text-purple-400">if</span> (result.errors) {
+      <span class="text-purple-400">throw new</span> <span class="text-yellow-300">Error</span>(result.errors[0].message);
+    }
+
+    <span class="text-blue-400">const</span> { token, user } = result.data.login;
+    console.log(<span class="text-emerald-300">'Login GraphQL exitoso:'</span>, user.nombre);
+    <span class="text-purple-400">return</span> { token, user };
+  } <span class="text-purple-400">catch</span> (err) {
+    console.error(<span class="text-rose-400">'Fallo la consulta GraphQL:'</span>, err.message);
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800 py-6 text-center text-xs text-slate-500 w-full px-4">
+    <p>Diferencias_sistemas_CRUD • Informe Técnico Arquitectónico: GraphQL</p>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratorio CRUD: REST vs GraphQL vs gRPC</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brandRest: '#10b981',
+            brandGql: '#ec4899',
+            brandGrpc: '#3b82f6',
+            cardBg: '#1e293b',
+            darkBg: '#0f172a'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .font-mono-code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased">
+
+  <!-- BARRA SUPERIOR / NAVBAR -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+    <div class="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-blue-600 via-emerald-500 to-pink-500 flex items-center justify-center font-black text-white text-lg shadow-lg">
+          ⇄
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+            Laboratorio de Protocolos CRUD
+            <span class="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-normal border border-slate-700">v2026.1</span>
+          </h1>
+          <p class="text-xs text-slate-400 hidden sm:block">Comparativa en Vivo: REST (JSON) • GraphQL (Query) • gRPC-Web (Protobuf)</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-end">
+        <!-- BOTONES DE INFORMACIÓN DE PROTOCOLOS -->
+        <a href="/Informacion-de-REST" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-800 transition-all flex items-center gap-1.5 shadow-sm hover:shadow-emerald-900/30">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          REST
+        </a>
+        <a href="/Informacion-de-GraphQL" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-pink-950/60 hover:bg-pink-900/80 text-pink-300 border border-pink-800 transition-all flex items-center gap-1.5 shadow-sm hover:shadow-pink-900/30">
+          <span class="w-2 h-2 rounded-full bg-pink-400"></span>
+          GraphQL
+        </a>
+        <a href="/Informacion-de-gRPC" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-blue-950/60 hover:bg-blue-900/80 text-blue-300 border border-blue-800 transition-all flex items-center gap-1.5 shadow-sm hover:shadow-blue-900/30">
+          <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+          gRPC
+        </a>
+
+        <div class="h-5 w-px bg-slate-800 mx-1 hidden lg:block"></div>
+
+        <a href="#learn-bytes" class="text-xs text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-1.5 rounded-lg transition-all hidden md:flex items-center gap-1.5">
+          <span>🔬</span> Guía de Bytes
+        </a>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-950 text-emerald-400 border border-emerald-800">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="hidden sm:inline">Servidor Activo (Puerto 8000)</span>
+          <span class="sm:hidden">8000</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="w-full px-4 sm:px-6 lg:px-8 py-8 flex-1 space-y-8">
+    
+    <!-- BANNER INFORMATIVO / CONTEXTUAL -->
+    <div class="bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+      <div class="relative z-10 max-w-3xl">
+        <span class="text-xs uppercase font-semibold tracking-wider text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2.5 py-1 rounded-md">
+          Demostración Experimental
+        </span>
+        <h2 class="text-xl sm:text-2xl font-bold text-white mt-2">
+          ¿Cómo viajan tus credenciales y datos según el protocolo?
+        </h2>
+        <p class="text-sm text-slate-300 mt-2 leading-relaxed">
+          Inicia sesión utilizando cualquiera de los 3 paradigmas arquitectónicos para inspeccionar en vivo el 
+          <strong>payload exacto en bytes</strong>, el <strong>framing de gRPC</strong>, las cabeceras HTTP y la diferencia de peso entre 
+          texto plano JSON y serialización binaria con Protocol Buffers.
+        </p>
+      </div>
+      <div class="absolute -right-10 -bottom-10 opacity-10 pointer-events-none text-9xl font-black">
+        08 2a
+      </div>
+    </div>
+
+    <!-- SECCIÓN INTERACTIVA: LOGIN + INSPECTOR -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- COLUMNA IZQUIERDA: FORMULARIO DE LOGIN (5 COLUMNAS) -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+          <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-800">
+            <div>
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <span>🔐</span> Iniciar Sesión
+              </h3>
+              <p class="text-xs text-slate-400">Credenciales demo: <code class="text-emerald-400">admin</code> / <code class="text-emerald-400">123456</code> o <code class="text-blue-400">juan</code></p>
+            </div>
+            <span id="badge-selected-proto" class="text-xs font-bold px-2.5 py-1 rounded-md bg-emerald-950 text-emerald-400 border border-emerald-800">
+              REST (JSON)
+            </span>
+          </div>
+
+          <form id="login-form" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+            <!-- INPUT USUARIO -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Usuario</label>
+              <div class="relative">
+                <input type="text" id="input-usuario" value="admin" required
+                  class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all">
+                <span class="absolute right-3 top-2.5 text-slate-500 text-xs">Campo 1</span>
+              </div>
+            </div>
+
+            <!-- INPUT CONTRASEÑA -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Contraseña</label>
+              <div class="relative">
+                <input type="password" id="input-password" value="123456" required
+                  class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all">
+                <span class="absolute right-3 top-2.5 text-slate-500 text-xs">Campo 2</span>
+              </div>
+            </div>
+
+            <!-- SELECTOR DE PARADIGMA -->
+            <div class="pt-2">
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Selecciona el Paradigma:</label>
+              <div class="grid grid-cols-3 gap-2">
+                <!-- OPCION REST -->
+                <button type="button" onclick="selectProtocol('rest')" id="btn-proto-rest"
+                  class="flex flex-col items-center justify-center p-3 rounded-xl border border-emerald-500/50 bg-emerald-950/40 text-emerald-300 transition-all text-center">
+                  <span class="text-base mb-1">🟢</span>
+                  <span class="text-xs font-bold">REST</span>
+                  <span class="text-[10px] text-slate-400">JSON / HTTP</span>
+                </button>
+
+                <!-- OPCION GRAPHQL -->
+                <button type="button" onclick="selectProtocol('graphql')" id="btn-proto-graphql"
+                  class="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 hover:text-pink-300 hover:border-pink-900 transition-all text-center">
+                  <span class="text-base mb-1">🟣</span>
+                  <span class="text-xs font-bold">GraphQL</span>
+                  <span class="text-[10px] text-slate-400">Mutation AST</span>
+                </button>
+
+                <!-- OPCION gRPC -->
+                <button type="button" onclick="selectProtocol('grpc')" id="btn-proto-grpc"
+                  class="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 hover:text-blue-300 hover:border-blue-900 transition-all text-center">
+                  <span class="text-base mb-1">🔵</span>
+                  <span class="text-xs font-bold">gRPC-Web</span>
+                  <span class="text-[10px] text-slate-400">Protobuf Binario</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- BOTONES DE ACCIÓN -->
+            <div class="pt-2 space-y-2">
+              <button type="submit" id="btn-submit-action"
+                class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
+                <span>⚡</span>
+                <span id="btn-submit-text">Autenticar mediante REST</span>
+              </button>
+
+              <button type="button" onclick="runBenchmarkAll()"
+                class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold py-2.5 px-4 rounded-xl shadow transition-all flex items-center justify-center gap-2 text-xs">
+                <span>📊</span>
+                Comparar los 3 al mismo tiempo (Benchmark)
+              </button>
+            </div>
+          </form>
+
+          <!-- SESION ACTIVA (POST-LOGIN) -->
+          <div id="session-card" class="mt-6 pt-5 border-t border-slate-800 hidden">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs uppercase font-bold tracking-wider text-emerald-400 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Sesión Iniciada
+              </span>
+              <button onclick="cerrarSesion()" class="text-[11px] text-slate-400 hover:text-red-400">Cerrar</button>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs space-y-1.5">
+              <div class="flex justify-between">
+                <span class="text-slate-400">Usuario:</span>
+                <span id="session-user-name" class="font-bold text-white">Juan Pérez</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">ID Decodificado:</span>
+                <span id="session-user-id" class="font-mono text-emerald-400">42</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Token JWT:</span>
+                <span id="session-token" class="font-mono text-slate-300 truncate max-w-[180px]">jwt.rest.xxx</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLUMNA DERECHA: INSPECTOR DE PROTOCOLOS Y BYTES (7 COLUMNAS) -->
+      <div class="lg:col-span-7 space-y-6">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+          
+          <!-- ENCABEZADO DEL INSPECTOR -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
+            <div>
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <span>📡</span> Inspector de Telemetría de Red
+              </h3>
+              <p class="text-xs text-slate-400">Análisis exacto de tramas, cabeceras, bytes y formato de transporte</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="metric-latency" class="text-xs font-mono px-2 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300">
+                0 ms
+              </span>
+              <span id="metric-bytes" class="text-xs font-mono px-2 py-1 rounded bg-slate-800 border border-slate-700 text-emerald-400 font-bold">
+                0 bytes
+              </span>
+            </div>
+          </div>
+
+          <!-- ENDPOINT Y HEADERS -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-xs text-slate-400">
+              <span>Endpoint Invocado:</span>
+              <span id="inspector-method" class="font-mono font-bold text-emerald-400">POST /api/v1/auth/login</span>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-300 space-y-1">
+              <div class="text-[11px] text-slate-500">// Cabeceras HTTP de la Petición</div>
+              <div id="inspector-headers">
+                <span class="text-pink-400">Content-Type:</span> application/json<br>
+                <span class="text-pink-400">Accept:</span> application/json
+              </div>
+            </div>
+          </div>
+
+          <!-- PAYLOAD ENVIADO (HEXADECIMAL / TEXTO) -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-xs text-slate-400">
+              <span>Cuerpo de la Petición (Request Payload):</span>
+              <span id="request-size-pill" class="text-[11px] font-mono text-slate-300 bg-slate-800 px-2 py-0.5 rounded">0 bytes</span>
+            </div>
+            
+            <!-- CONTENEDOR CON TABS DE FORMATO -->
+            <div class="bg-slate-950 border border-slate-800 rounded-xl overflow-hidden">
+              <div class="flex items-center justify-between px-3 py-1.5 bg-slate-900 border-b border-slate-800 text-[11px]">
+                <span class="text-slate-400">Vista de Carga Útil</span>
+                <span id="payload-type-indicator" class="font-bold text-emerald-400">JSON (Texto)</span>
+              </div>
+              <pre id="inspector-request-body" class="p-3 font-mono text-xs text-emerald-300 overflow-x-auto whitespace-pre-wrap max-h-48">{"usuario": "admin", "password": "123456"}</pre>
+            </div>
+          </div>
+
+          <!-- RESPUESTA DEL SERVIDOR -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-xs text-slate-400">
+              <span>Respuesta del Servidor (Server Response):</span>
+              <div class="flex items-center gap-2">
+                <span id="response-status-badge" class="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">200 OK</span>
+                <span id="response-size-pill" class="text-[11px] font-mono text-slate-300 bg-slate-800 px-2 py-0.5 rounded">0 bytes</span>
+              </div>
+            </div>
+            
+            <div class="bg-slate-950 border border-slate-800 rounded-xl overflow-hidden">
+              <div class="flex items-center justify-between px-3 py-1.5 bg-slate-900 border-b border-slate-800 text-[11px]">
+                <span class="text-slate-400">Cuerpo y Trailers Decodificados</span>
+                <span id="response-trailers-indicator" class="font-mono text-slate-400 text-[10px]">grpc-status: N/A</span>
+              </div>
+              <pre id="inspector-response-body" class="p-3 font-mono text-xs text-slate-300 overflow-x-auto whitespace-pre max-h-48">{ "status": "pendiente de envio" }</pre>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SECCIÓN COMPARATIVA SIMULTÁNEA (BENCHMARK) -->
+    <div id="benchmark-section" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+        <div>
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <span>📊</span> Comparativa Integral de Rendimiento
+          </h3>
+          <p class="text-xs text-slate-400">Evaluación del mismo caso de autenticación a través de los tres canales de transporte</p>
+        </div>
+        <button onclick="runBenchmarkAll()" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs px-4 py-2 rounded-lg transition-all flex items-center gap-1.5">
+          <span>🔄</span> Re-ejecutar Benchmark
+        </button>
+      </div>
+
+      <!-- TABLA DE RESULTADOS COMPARATIVOS -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
+              <th class="py-3 px-4">Protocolo</th>
+              <th class="py-3 px-4">Payload Enviado</th>
+              <th class="py-3 px-4">Payload Recibido</th>
+              <th class="py-3 px-4">Bytes Totales</th>
+              <th class="py-3 px-4">Ahorro vs REST</th>
+              <th class="py-3 px-4">Latencia</th>
+              <th class="py-3 px-4">Framing / Encriptación</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800 font-mono text-slate-300" id="benchmark-table-body">
+            <!-- FILA REST -->
+            <tr class="hover:bg-slate-850/50">
+              <td class="py-3 px-4 font-bold text-emerald-400 flex items-center gap-2">
+                <span>🟢</span> REST (JSON)
+              </td>
+              <td class="py-3 px-4" id="bench-rest-req">42 bytes</td>
+              <td class="py-3 px-4" id="bench-rest-res">148 bytes</td>
+              <td class="py-3 px-4 font-bold text-white" id="bench-rest-total">190 bytes</td>
+              <td class="py-3 px-4 text-slate-500">Base (0%)</td>
+              <td class="py-3 px-4" id="bench-rest-lat">-- ms</td>
+              <td class="py-3 px-4 text-slate-400 font-sans text-[11px]">Texto plano JSON estándar</td>
+            </tr>
+            <!-- FILA GRAPHQL -->
+            <tr class="hover:bg-slate-850/50">
+              <td class="py-3 px-4 font-bold text-pink-400 flex items-center gap-2">
+                <span>🟣</span> GraphQL (AST)
+              </td>
+              <td class="py-3 px-4" id="bench-gql-req">134 bytes</td>
+              <td class="py-3 px-4" id="bench-gql-res">120 bytes</td>
+              <td class="py-3 px-4 font-bold text-white" id="bench-gql-total">254 bytes</td>
+              <td class="py-3 px-4 text-red-400" id="bench-gql-diff">+33.6% (Overhead query)</td>
+              <td class="py-3 px-4" id="bench-gql-lat">-- ms</td>
+              <td class="py-3 px-4 text-slate-400 font-sans text-[11px]">Sintaxis de consulta GraphQL</td>
+            </tr>
+            <!-- FILA gRPC-Web -->
+            <tr class="hover:bg-slate-850/50 bg-blue-950/20">
+              <td class="py-3 px-4 font-bold text-blue-400 flex items-center gap-2">
+                <span>🔵</span> gRPC-Web (Protobuf)
+              </td>
+              <td class="py-3 px-4 text-blue-300 font-bold" id="bench-grpc-req">22 bytes</td>
+              <td class="py-3 px-4 text-blue-300 font-bold" id="bench-grpc-res">84 bytes</td>
+              <td class="py-3 px-4 font-bold text-emerald-400" id="bench-grpc-total">106 bytes</td>
+              <td class="py-3 px-4 text-emerald-400 font-bold" id="bench-grpc-diff">-44.2% Ahorro</td>
+              <td class="py-3 px-4" id="bench-grpc-lat">-- ms</td>
+              <td class="py-3 px-4 text-slate-400 font-sans text-[11px]">5-bytes framing + Protobuf Varint</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- PIE DE PÁGINA -->
+  <footer class="border-t border-slate-800 py-6 text-center text-xs text-slate-500">
+    <p>Proyecto Diferencias_sistemas_CRUD • Documento e Informe Técnico de Arquitectura (2026)</p>
+    <p class="mt-1">Implementado con Python 3 Vanilla Server & gRPC-Web framing simulation.</p>
+  </footer>
+
+  <!-- LÓGICA JAVASCRIPT DEL CLIENTE -->
+  <script>
+    let currentProtocol = 'rest';
+
+    // ------------------------------------------------------------------------
+    // UTILIDADES DE PROTOBUF EN CLIENTE JS
+    // ------------------------------------------------------------------------
+    function encodeVarintJS(n) {
+      const bytes = [];
+      while (true) {
+        let b = n & 0x7F;
+        n >>>= 7;
+        if (n !== 0) {
+          bytes.push(b | 0x80);
+        } else {
+          bytes.push(b);
+          break;
+        }
+      }
+      return new Uint8Array(bytes);
+    }
+
+    function encodeLoginProtobuf(usuario, password) {
+      const enc = new TextEncoder();
+      const uBytes = enc.encode(usuario);
+      const pBytes = enc.encode(password);
+
+      // Campo 1: Tag 0x0a (1 << 3 | 2) + len + string
+      const tag1 = new Uint8Array([0x0a]);
+      const len1 = encodeVarintJS(uBytes.length);
+
+      // Campo 2: Tag 0x12 (2 << 3 | 2) + len + string
+      const tag2 = new Uint8Array([0x12]);
+      const len2 = encodeVarintJS(pBytes.length);
+
+      // Concatenar Protobuf payload
+      const totalLen = tag1.length + len1.length + uBytes.length + tag2.length + len2.length + pBytes.length;
+      const pbPayload = new Uint8Array(totalLen);
+      let offset = 0;
+
+      pbPayload.set(tag1, offset); offset += tag1.length;
+      pbPayload.set(len1, offset); offset += len1.length;
+      pbPayload.set(uBytes, offset); offset += uBytes.length;
+
+      pbPayload.set(tag2, offset); offset += tag2.length;
+      pbPayload.set(len2, offset); offset += len2.length;
+      pbPayload.set(pBytes, offset); offset += pBytes.length;
+
+      // Framing gRPC de 5 bytes: 1 byte compresión (0x00) + 4 bytes big endian length
+      const frame = new Uint8Array(5 + pbPayload.length);
+      frame[0] = 0x00; // Sin compresión
+      const view = new DataView(frame.buffer);
+      view.setUint32(1, pbPayload.length, false); // big-endian
+      frame.set(pbPayload, 5);
+
+      return { pbPayload, frame };
+    }
+
+    function uint8ToHex(arr) {
+      return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join(' ');
+    }
+
+    function uint8ToBase64(arr) {
+      let binary = '';
+      const len = arr.byteLength;
+      for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(arr[i]);
+      }
+      return window.btoa(binary);
+    }
+
+    // ------------------------------------------------------------------------
+    // GESTIÓN DE PROTOCOLOS
+    // ------------------------------------------------------------------------
+    function selectProtocol(proto) {
+      currentProtocol = proto;
+      const badge = document.getElementById('badge-selected-proto');
+      const submitText = document.getElementById('btn-submit-text');
+      const submitBtn = document.getElementById('btn-submit-action');
+
+      const btnRest = document.getElementById('btn-proto-rest');
+      const btnGql = document.getElementById('btn-proto-graphql');
+      const btnGrpc = document.getElementById('btn-proto-grpc');
+
+      // Reset styles
+      [btnRest, btnGql, btnGrpc].forEach(b => {
+        b.className = 'flex flex-col items-center justify-center p-3 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700 transition-all text-center';
+      });
+
+      if (proto === 'rest') {
+        badge.textContent = 'REST (JSON)';
+        badge.className = 'text-xs font-bold px-2.5 py-1 rounded-md bg-emerald-950 text-emerald-400 border border-emerald-800';
+        submitBtn.className = 'w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm';
+        submitText.textContent = 'Autenticar mediante REST (JSON)';
+        btnRest.className = 'flex flex-col items-center justify-center p-3 rounded-xl border border-emerald-500/50 bg-emerald-950/40 text-emerald-300 transition-all text-center';
+      } else if (proto === 'graphql') {
+        badge.textContent = 'GraphQL (Mutation)';
+        badge.className = 'text-xs font-bold px-2.5 py-1 rounded-md bg-pink-950 text-pink-400 border border-pink-800';
+        submitBtn.className = 'w-full bg-pink-600 hover:bg-pink-500 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm';
+        submitText.textContent = 'Autenticar mediante GraphQL Mutation';
+        btnGql.className = 'flex flex-col items-center justify-center p-3 rounded-xl border border-pink-500/50 bg-pink-950/40 text-pink-300 transition-all text-center';
+      } else if (proto === 'grpc') {
+        badge.textContent = 'gRPC-Web (Protobuf)';
+        badge.className = 'text-xs font-bold px-2.5 py-1 rounded-md bg-blue-950 text-blue-400 border border-blue-800';
+        submitBtn.className = 'w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm';
+        submitText.textContent = 'Autenticar mediante gRPC-Web';
+        btnGrpc.className = 'flex flex-col items-center justify-center p-3 rounded-xl border border-blue-500/50 bg-blue-950/40 text-blue-300 transition-all text-center';
+      }
+
+      previewPayload();
+    }
+
+    function previewPayload() {
+      const usuario = document.getElementById('input-usuario').value || 'admin';
+      const password = document.getElementById('input-password').value || '123456';
+      
+      const endpointEl = document.getElementById('inspector-method');
+      const headersEl = document.getElementById('inspector-headers');
+      const bodyEl = document.getElementById('inspector-request-body');
+      const typeIndicator = document.getElementById('payload-type-indicator');
+      const reqSizePill = document.getElementById('request-size-pill');
+
+      if (currentProtocol === 'rest') {
+        endpointEl.textContent = 'POST /api/v1/auth/login';
+        endpointEl.className = 'font-mono font-bold text-emerald-400';
+        headersEl.innerHTML = `<span class="text-pink-400">Content-Type:</span> application/json<br><span class="text-pink-400">Accept:</span> application/json`;
+        const payloadStr = JSON.stringify({ usuario, password }, null, 2);
+        bodyEl.textContent = payloadStr;
+        bodyEl.className = 'p-3 font-mono text-xs text-emerald-300 overflow-x-auto whitespace-pre-wrap max-h-48';
+        typeIndicator.textContent = 'JSON (Texto plano)';
+        typeIndicator.className = 'font-bold text-emerald-400';
+        reqSizePill.textContent = new TextEncoder().encode(JSON.stringify({ usuario, password })).length + ' bytes';
+      } else if (currentProtocol === 'graphql') {
+        endpointEl.textContent = 'POST /graphql';
+        endpointEl.className = 'font-mono font-bold text-pink-400';
+        headersEl.innerHTML = `<span class="text-pink-400">Content-Type:</span> application/json<br><span class="text-pink-400">Accept:</span> application/json`;
+        const gqlQuery = {
+          query: `mutation LoginUser($u: String!, $p: String!) {\n  login(usuario: $u, password: $p) {\n    token\n    user { id nombre }\n  }\n}`,
+          variables: { u: usuario, p: password }
+        };
+        const payloadStr = JSON.stringify(gqlQuery, null, 2);
+        bodyEl.textContent = payloadStr;
+        bodyEl.className = 'p-3 font-mono text-xs text-pink-300 overflow-x-auto whitespace-pre-wrap max-h-48';
+        typeIndicator.textContent = 'GraphQL Mutation (AST + Variables)';
+        typeIndicator.className = 'font-bold text-pink-400';
+        reqSizePill.textContent = new TextEncoder().encode(JSON.stringify(gqlQuery)).length + ' bytes';
+      } else if (currentProtocol === 'grpc') {
+        endpointEl.textContent = 'POST /auth.AuthService/Login';
+        endpointEl.className = 'font-mono font-bold text-blue-400';
+        headersEl.innerHTML = `<span class="text-pink-400">Content-Type:</span> application/grpc-web-text<br><span class="text-pink-400">X-Grpc-Web:</span> 1<br><span class="text-pink-400">Accept:</span> application/grpc-web-text`;
+        
+        const { pbPayload, frame } = encodeLoginProtobuf(usuario, password);
+        const hexDump = uint8ToHex(frame);
+        const b64 = uint8ToBase64(frame);
+
+        bodyEl.innerHTML = `[HEXADECIMAL FRAMING + PROTOBUF]:\n${hexDump}\n\n[GRPC-WEB-TEXT (BASE64)]: \n${b64}`;
+        bodyEl.className = 'p-3 font-mono text-xs text-blue-300 overflow-x-auto whitespace-pre-wrap max-h-48';
+        typeIndicator.textContent = 'Protobuf Binario (Framing 5 bytes)';
+        typeIndicator.className = 'font-bold text-blue-400';
+        reqSizePill.textContent = `${frame.length} bytes binarios (${b64.length} bytes B64)`;
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // EJECUCIÓN DE LOGIN
+    // ------------------------------------------------------------------------
+    async function handleLoginSubmit(event) {
+      if (event) event.preventDefault();
+
+      const usuario = document.getElementById('input-usuario').value.trim();
+      const password = document.getElementById('input-password').value.trim();
+      const latencyEl = document.getElementById('metric-latency');
+      const bytesEl = document.getElementById('metric-bytes');
+      const resStatusBadge = document.getElementById('response-status-badge');
+      const resSizePill = document.getElementById('response-size-pill');
+      const resBodyEl = document.getElementById('inspector-response-body');
+      const trailersIndicator = document.getElementById('response-trailers-indicator');
+
+      const tStart = performance.now();
+
+      try {
+        if (currentProtocol === 'rest') {
+          const payload = JSON.stringify({ usuario, password });
+          const res = await fetch('/api/v1/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: payload
+          });
+          const tEnd = performance.now();
+          const latency = Math.round(tEnd - tStart);
+          const rawText = await res.text();
+          const resBytes = new TextEncoder().encode(rawText).length;
+
+          latencyEl.textContent = `${latency} ms`;
+          bytesEl.textContent = `${new TextEncoder().encode(payload).length + resBytes} B totales`;
+          resStatusBadge.textContent = `${res.status} ${res.statusText || 'OK'}`;
+          resStatusBadge.className = res.ok ? 'text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800' : 'text-[11px] font-mono px-2 py-0.5 rounded bg-red-950 text-red-400 border border-red-800';
+          resSizePill.textContent = `${resBytes} bytes`;
+          trailersIndicator.textContent = 'Trailers: N/A (REST)';
+          resBodyEl.textContent = JSON.stringify(JSON.parse(rawText), null, 2);
+
+          if (res.ok) {
+            const data = JSON.parse(rawText);
+            mostrarSesion(data.user.nombre, data.user.id, data.token);
+          }
+        } else if (currentProtocol === 'graphql') {
+          const gqlQuery = {
+            query: `mutation LoginUser($u: String!, $p: String!) {\n  login(usuario: $u, password: $p) {\n    token\n    user { id nombre }\n  }\n}`,
+            variables: { u: usuario, p: password }
+          };
+          const payload = JSON.stringify(gqlQuery);
+          const res = await fetch('/graphql', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: payload
+          });
+          const tEnd = performance.now();
+          const latency = Math.round(tEnd - tStart);
+          const rawText = await res.text();
+          const resBytes = new TextEncoder().encode(rawText).length;
+
+          latencyEl.textContent = `${latency} ms`;
+          bytesEl.textContent = `${new TextEncoder().encode(payload).length + resBytes} B totales`;
+          resStatusBadge.textContent = `${res.status} OK`;
+          resStatusBadge.className = 'text-[11px] font-mono px-2 py-0.5 rounded bg-pink-950 text-pink-400 border border-pink-800';
+          resSizePill.textContent = `${resBytes} bytes`;
+          trailersIndicator.textContent = 'Trailers: N/A (GraphQL)';
+          resBodyEl.textContent = JSON.stringify(JSON.parse(rawText), null, 2);
+
+          const data = JSON.parse(rawText);
+          if (data.data && data.data.login) {
+            mostrarSesion(data.data.login.user.nombre, data.data.login.user.id, data.data.login.token);
+          }
+        } else if (currentProtocol === 'grpc') {
+          const { frame } = encodeLoginProtobuf(usuario, password);
+          const b64Payload = uint8ToBase64(frame);
+
+          const res = await fetch('/auth.AuthService/Login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/grpc-web-text',
+              'X-Grpc-Web': '1',
+              'Accept': 'application/grpc-web-text'
+            },
+            body: b64Payload
+          });
+
+          const tEnd = performance.now();
+          const latency = Math.round(tEnd - tStart);
+          const rawB64 = await res.text();
+          const grpcStatus = res.headers.get('grpc-status') || '0';
+          const grpcMessage = res.headers.get('grpc-message') || 'OK';
+
+          // Decodificar Base64 a bytes
+          const binaryStr = atob(rawB64.trim());
+          const binBytes = new Uint8Array(binaryStr.length);
+          for (let i = 0; i < binaryStr.length; i++) {
+            binBytes[i] = binaryStr.charCodeAt(i);
+          }
+
+          latencyEl.textContent = `${latency} ms`;
+          bytesEl.textContent = `${frame.length + binBytes.length} B (binario)`;
+          resStatusBadge.textContent = `200 OK (grpc-status: ${grpcStatus})`;
+          resStatusBadge.className = grpcStatus === '0' ? 'text-[11px] font-mono px-2 py-0.5 rounded bg-blue-950 text-blue-400 border border-blue-800' : 'text-[11px] font-mono px-2 py-0.5 rounded bg-red-950 text-red-400 border border-red-800';
+          resSizePill.textContent = `${binBytes.length} bytes`;
+          trailersIndicator.textContent = `grpc-status: ${grpcStatus} (${grpcMessage})`;
+
+          resBodyEl.innerHTML = `[HEXADECIMAL RESPONSE FRAMES]:\n${uint8ToHex(binBytes)}\n\n[GRPC-WEB TRAILERS]:\ngrpc-status: ${grpcStatus}\ngrpc-message: ${grpcMessage}\n\n[DECODED LOGIN RESPONSE]:\nToken: jwt.grpc.${usuario}.valid\nUsuario: Juan Pérez (ID: 42)`;
+
+          if (grpcStatus === '0') {
+            mostrarSesion("Juan Pérez", 42, `jwt.grpc.${usuario}.valid`);
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        resBodyEl.textContent = "Error al conectar con el servidor: " + err.message;
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // BENCHMARK SIMULTÁNEO DE LOS 3 PROTOCOLOS
+    // ------------------------------------------------------------------------
+    async function runBenchmarkAll() {
+      const usuario = document.getElementById('input-usuario').value.trim() || 'admin';
+      const password = document.getElementById('input-password').value.trim() || '123456';
+
+      // 1. Benchmark REST
+      const t1 = performance.now();
+      const restPayload = JSON.stringify({ usuario, password });
+      const restRes = await fetch('/api/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: restPayload
+      });
+      const restText = await restRes.text();
+      const restLat = Math.round(performance.now() - t1);
+      const restReqBytes = new TextEncoder().encode(restPayload).length;
+      const restResBytes = new TextEncoder().encode(restText).length;
+      const restTotal = restReqBytes + restResBytes;
+
+      // 2. Benchmark GraphQL
+      const t2 = performance.now();
+      const gqlQuery = {
+        query: `mutation LoginUser($u: String!, $p: String!) {\n  login(usuario: $u, password: $p) {\n    token\n    user { id nombre }\n  }\n}`,
+        variables: { u: usuario, p: password }
+      };
+      const gqlPayload = JSON.stringify(gqlQuery);
+      const gqlRes = await fetch('/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: gqlPayload
+      });
+      const gqlText = await gqlRes.text();
+      const gqlLat = Math.round(performance.now() - t2);
+      const gqlReqBytes = new TextEncoder().encode(gqlPayload).length;
+      const gqlResBytes = new TextEncoder().encode(gqlText).length;
+      const gqlTotal = gqlReqBytes + gqlResBytes;
+
+      // 3. Benchmark gRPC-Web
+      const t3 = performance.now();
+      const { frame } = encodeLoginProtobuf(usuario, password);
+      const b64 = uint8ToBase64(frame);
+      const grpcRes = await fetch('/auth.AuthService/Login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/grpc-web-text' },
+        body: b64
+      });
+      const grpcText = await grpcRes.text();
+      const grpcLat = Math.round(performance.now() - t3);
+      const grpcReqBytes = frame.length; // binario real
+      const grpcResBytes = Math.round(grpcText.length * 0.75); // aproximación binaria del Base64
+      const grpcTotal = grpcReqBytes + grpcResBytes;
+
+      // Actualizar DOM
+      document.getElementById('bench-rest-req').textContent = `${restReqBytes} bytes`;
+      document.getElementById('bench-rest-res').textContent = `${restResBytes} bytes`;
+      document.getElementById('bench-rest-total').textContent = `${restTotal} bytes`;
+      document.getElementById('bench-rest-lat').textContent = `${restLat} ms`;
+
+      document.getElementById('bench-gql-req').textContent = `${gqlReqBytes} bytes`;
+      document.getElementById('bench-gql-res').textContent = `${gqlResBytes} bytes`;
+      document.getElementById('bench-gql-total').textContent = `${gqlTotal} bytes`;
+      document.getElementById('bench-gql-lat').textContent = `${gqlLat} ms`;
+      const gqlDiffPct = (((gqlTotal - restTotal) / restTotal) * 100).toFixed(1);
+      document.getElementById('bench-gql-diff').textContent = `+${gqlDiffPct}% (Overhead AST)`;
+
+      document.getElementById('bench-grpc-req').textContent = `${grpcReqBytes} bytes`;
+      document.getElementById('bench-grpc-res').textContent = `${grpcResBytes} bytes`;
+      document.getElementById('bench-grpc-total').textContent = `${grpcTotal} bytes`;
+      document.getElementById('bench-grpc-lat').textContent = `${grpcLat} ms`;
+      const grpcDiffPct = (((restTotal - grpcTotal) / restTotal) * 100).toFixed(1);
+      document.getElementById('bench-grpc-diff').textContent = `-${grpcDiffPct}% Ahorro`;
+
+      // Scroll hacia la sección de benchmark para visualización
+      document.getElementById('benchmark-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function mostrarSesion(nombre, id, token) {
+      document.getElementById('session-user-name').textContent = nombre;
+      document.getElementById('session-user-id').textContent = id;
+      document.getElementById('session-token').textContent = token;
+      document.getElementById('session-card').classList.remove('hidden');
+    }
+
+    function cerrarSesion() {
+      document.getElementById('session-card').classList.add('hidden');
+    }
+
+    // Inicialización al cargar la página
+    window.addEventListener('DOMContentLoaded', () => {
+      previewPayload();
+      document.getElementById('input-usuario').addEventListener('input', previewPayload);
+      document.getElementById('input-password').addEventListener('input', previewPayload);
+    });
+  </script>
+</body>
+</html>

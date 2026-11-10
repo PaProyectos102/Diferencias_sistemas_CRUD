@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REST: Informe Técnico y Arquitectura</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brandRest: '#10b981',
+            darkBg: '#0f172a'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased">
+
+  <!-- NAVBAR -->
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
+    <div class="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="/" class="w-9 h-9 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center font-bold text-emerald-400 text-lg hover:bg-emerald-500/30 transition-all">
+          ←
+        </a>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+            <h1 class="text-base sm:text-lg font-bold text-white tracking-tight">REST (Representational State Transfer)</h1>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 font-semibold">Informe Técnico</span>
+          </div>
+          <p class="text-xs text-slate-400 hidden sm:block">Estándar de arquitectura de recursos web sobre protocolo HTTP</p>
+        </div>
+      </div>
+
+      <!-- SWITCHER DE PROTOCOLOS -->
+      <div class="flex items-center gap-2">
+        <a href="/" class="text-xs text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-1.5 rounded-lg transition-all hidden md:flex items-center gap-1.5">
+          <span>🏠</span> Laboratorio
+        </a>
+        <a href="/Informacion-de-GraphQL" class="text-xs text-pink-300 hover:text-white bg-pink-950/40 hover:bg-pink-900/50 border border-pink-800/60 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1">
+          <span>🟣</span> GraphQL
+        </a>
+        <a href="/Informacion-de-gRPC" class="text-xs text-blue-300 hover:text-white bg-blue-950/40 hover:bg-blue-900/50 border border-blue-800/60 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1">
+          <span>🔵</span> gRPC
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="w-full px-4 sm:px-6 lg:px-8 py-8 flex-1 space-y-8 max-w-6xl mx-auto">
+
+    <!-- HERO BANNER -->
+    <div class="bg-gradient-to-r from-emerald-950/50 via-slate-900 to-slate-900 border border-emerald-800/50 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+      <div class="max-w-3xl space-y-3">
+        <span class="text-xs uppercase font-bold tracking-wider text-emerald-400 bg-emerald-950 border border-emerald-800 px-3 py-1 rounded-md inline-block">
+          Paradigma Basado en Recursos
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white">
+          ¿De qué trata REST y para qué se usa?
+        </h2>
+        <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+          <strong>REST</strong> es un estilo de arquitectura de software para sistemas distribuidos introducido en el año 2000 por <strong>Roy Fielding</strong> en su tesis doctoral. En lugar de ejecutar llamadas a métodos remotos, modela toda la información como <strong>recursos identificados por URIs</strong> y manipulados mediante verbos estándar del protocolo HTTP.
+        </p>
+      </div>
+      <div class="absolute -right-6 -bottom-6 opacity-10 pointer-events-none text-9xl font-black text-emerald-400">
+        GET
+      </div>
+    </div>
+
+    <!-- SECCIÓN 1: ¿PARA QUÉ SE USA? -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+      <h3 class="text-lg font-bold text-white flex items-center gap-2">
+        <span class="text-emerald-400">🎯</span> ¿Para qué se usa principalmente?
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-2">
+          <div class="text-emerald-400 font-bold">1. APIs Públicas e Integraciones</div>
+          <p class="text-slate-400 text-xs leading-relaxed">
+            Es el estándar universal de la web abierta (Stripe, GitHub, Twilio, Google APIs). Cualquier cliente o lenguaje con soporte HTTP puede consumir un servicio REST sin librerías adicionales.
+          </p>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-2">
+          <div class="text-emerald-400 font-bold">2. Sistemas CRUD Clásicos</div>
+          <p class="text-slate-400 text-xs leading-relaxed">
+            Gestión directa de entidades independientes: usuarios, facturas, productos, pedidos, donde las operaciones mapean de forma natural con Crear, Leer, Actualizar y Eliminar.
+          </p>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-2">
+          <div class="text-emerald-400 font-bold">3. Caché de Borde y CDNs</div>
+          <p class="text-slate-400 text-xs leading-relaxed">
+            Aprovecha la infraestructura de internet para cachear respuestas a nivel de proxy o CDN con cabeceras <code class="text-emerald-300">Cache-Control</code> y validación <code class="text-emerald-300">ETag</code>.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2: PRINCIPIOS ARQUITECTÓNICOS -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+      <h3 class="text-lg font-bold text-white flex items-center gap-2">
+        <span class="text-emerald-400">🏛️</span> Principios Arquitectónicos Fundamentales
+      </h3>
+
+      <div class="space-y-4 text-sm text-slate-300">
+        <div class="border-l-2 border-emerald-500 pl-4 py-1 space-y-1">
+          <span class="font-bold text-white text-base">1. Orientación a Recursos</span>
+          <p class="text-xs text-slate-400">
+            Todo elemento manipulable es un recurso modelado como un sustantivo con una URI única e irrepetible.
+            Ejemplo: <code class="text-emerald-400 bg-slate-950 px-2 py-0.5 rounded">/api/v1/facturas/1042</code> o <code class="text-emerald-400 bg-slate-950 px-2 py-0.5 rounded">/api/v1/usuarios/42</code>.
+          </p>
+        </div>
+
+        <div class="border-l-2 border-emerald-500 pl-4 py-1 space-y-2">
+          <span class="font-bold text-white text-base">2. Semántica Estricta de Verbos HTTP</span>
+          <p class="text-xs text-slate-400">
+            Las acciones no viajan en el nombre del endpoint, sino en el verbo HTTP:
+          </p>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border border-slate-800 rounded-lg">
+              <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
+                <tr>
+                  <th class="py-2.5 px-3">Operación CRUD</th>
+                  <th class="py-2.5 px-3">Método HTTP</th>
+                  <th class="py-2.5 px-3">Endpoint Ejemplo</th>
+                  <th class="py-2.5 px-3">Idempotente</th>
+                  <th class="py-2.5 px-3">Seguro (Safe)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800 font-mono">
+                <tr>
+                  <td class="py-2 px-3 font-sans font-bold text-white">Create</td>
+                  <td class="py-2 px-3 text-emerald-400 font-bold">POST</td>
+                  <td class="py-2 px-3 text-slate-300">/api/v1/usuarios</td>
+                  <td class="py-2 px-3 text-red-400">No</td>
+                  <td class="py-2 px-3 text-red-400">No</td>
+                </tr>
+                <tr>
+                  <td class="py-2 px-3 font-sans font-bold text-white">Read</td>
+                  <td class="py-2 px-3 text-blue-400 font-bold">GET</td>
+                  <td class="py-2 px-3 text-slate-300">/api/v1/usuarios/42</td>
+                  <td class="py-2 px-3 text-emerald-400">Sí</td>
+                  <td class="py-2 px-3 text-emerald-400">Sí</td>
+                </tr>
+                <tr>
+                  <td class="py-2 px-3 font-sans font-bold text-white">Update (Total)</td>
+                  <td class="py-2 px-3 text-amber-400 font-bold">PUT</td>
+                  <td class="py-2 px-3 text-slate-300">/api/v1/usuarios/42</td>
+                  <td class="py-2 px-3 text-emerald-400">Sí</td>
+                  <td class="py-2 px-3 text-red-400">No</td>
+                </tr>
+                <tr>
+                  <td class="py-2 px-3 font-sans font-bold text-white">Update (Parcial)</td>
+                  <td class="py-2 px-3 text-amber-300 font-bold">PATCH</td>
+                  <td class="py-2 px-3 text-slate-300">/api/v1/usuarios/42</td>
+                  <td class="py-2 px-3 text-slate-400">No neces.</td>
+                  <td class="py-2 px-3 text-red-400">No</td>
+                </tr>
+                <tr>
+                  <td class="py-2 px-3 font-sans font-bold text-white">Delete</td>
+                  <td class="py-2 px-3 text-rose-400 font-bold">DELETE</td>
+                  <td class="py-2 px-3 text-slate-300">/api/v1/usuarios/42</td>
+                  <td class="py-2 px-3 text-emerald-400">Sí</td>
+                  <td class="py-2 px-3 text-red-400">No</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="border-l-2 border-emerald-500 pl-4 py-1 space-y-1">
+          <span class="font-bold text-white text-base">3. Ausencia de Estado (Stateless)</span>
+          <p class="text-xs text-slate-400">
+            El servidor no retiene el estado de sesión del cliente entre peticiones. Toda solicitud debe contener la información necesaria para autenticar y resolver la operación (ej. cabecera <code class="text-emerald-400">Authorization: Bearer &lt;JWT&gt;</code>).
+          </p>
+        </div>
+
+        <div class="border-l-2 border-emerald-500 pl-4 py-1 space-y-1">
+          <span class="font-bold text-white text-base">4. Formatos de Intercambio</span>
+          <p class="text-xs text-slate-400">
+            Aunque REST es agnóstico a la representación, <strong>JSON</strong> (JavaScript Object Notation) se ha consolidado como el estándar absoluto de la industria debido a su fácil serialización y comprensión.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 3: VENTAJAS Y LIMITACIONES -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- VENTAJAS -->
+      <div class="bg-slate-900 border border-emerald-900/40 rounded-2xl p-6 shadow-xl space-y-4">
+        <h4 class="text-base font-bold text-emerald-400 flex items-center gap-2">
+          <span>✅</span> Ventajas Técnicas
+        </h4>
+        <ul class="text-xs text-slate-300 space-y-2.5 list-disc list-inside leading-relaxed">
+          <li><strong>Caché Nativa:</strong> Reutilización directa de CDNs intermedias con códigos <code class="text-emerald-400">304 Not Modified</code>.</li>
+          <li><strong>Universalidad:</strong> Compatible con cualquier navegador web, dispositivo o microcontrolador sin instalar SDKs.</li>
+          <li><strong>Depuración Inmediata:</strong> Peticiones legibles a simple vista con <code class="text-slate-200">curl</code>, Postman o devtools.</li>
+          <li><strong>Escalabilidad Horizontal:</strong> Al ser stateless, cualquier réplica del servicio puede atender cualquier solicitud.</li>
+        </ul>
+      </div>
+
+      <!-- LIMITACIONES -->
+      <div class="bg-slate-900 border border-red-900/40 rounded-2xl p-6 shadow-xl space-y-4">
+        <h4 class="text-base font-bold text-rose-400 flex items-center gap-2">
+          <span>⚠️</span> Limitaciones Arquitectónicas
+        </h4>
+        <ul class="text-xs text-slate-300 space-y-2.5 list-disc list-inside leading-relaxed">
+          <li><strong>Over-fetching:</strong> El servidor define la respuesta fija. Si una pantalla solo necesita el nombre del usuario, el endpoint devolverá igualmente 40 campos innecesarios.</li>
+          <li><strong>Under-fetching (Problema N+1):</strong> Para armar una vista compleja, el cliente debe realizar múltiples peticiones secuenciales encadenadas.</li>
+          <li><strong>Sobrecarga de Serialización:</strong> El formato de texto JSON repite los nombres de cada campo en cada objeto, aumentando el ancho de banda transferido.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 4: CÓMO SE CODEARÍA PARA QUE FUNCIONE (EJEMPLO COMPLETO) -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+      <div>
+        <span class="text-[11px] uppercase tracking-wider font-bold text-emerald-400">Implementación de Código</span>
+        <h3 class="text-xl font-bold text-white flex items-center gap-2 mt-1">
+          <span>💻</span> ¿Cómo se codearía una API REST para que funcione?
+        </h3>
+        <p class="text-xs sm:text-sm text-slate-300 mt-1">
+          A continuación se muestra el código real y completo para implementar este servicio tanto en el <strong>Backend (Servidor REST)</strong> como en el <strong>Frontend (Cliente Web)</strong>:
+        </p>
+      </div>
+
+      <!-- PASO 1: SERVIDOR BACKEND -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-bold text-emerald-400">Paso 1: Implementar el Servidor en Backend (Python / FastAPI)</span>
+          <span class="text-slate-500 text-[11px]">Server Implementation</span>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-200 overflow-x-auto">
+<pre><span class="text-purple-400">from</span> fastapi <span class="text-purple-400">import</span> FastAPI, HTTPException, status
+<span class="text-purple-400">from</span> pydantic <span class="text-purple-400">import</span> BaseModel
+
+app = <span class="text-yellow-300">FastAPI</span>(title=<span class="text-emerald-300">"API REST de Usuarios"</span>)
+
+<span class="text-slate-500"># Modelos de datos para validación automática</span>
+<span class="text-blue-400">class</span> <span class="text-amber-300">LoginRequest</span>(BaseModel):
+    usuario: <span class="text-blue-300">str</span>
+    password: <span class="text-blue-300">str</span>
+
+<span class="text-slate-500"># Endpoint REST: POST /api/v1/auth/login</span>
+<span class="text-amber-300">@app.post</span>(<span class="text-emerald-300">"/api/v1/auth/login"</span>, status_code=status.HTTP_200_OK)
+<span class="text-blue-400">def</span> <span class="text-yellow-300">login</span>(payload: LoginRequest):
+    <span class="text-purple-400">if</span> payload.usuario == <span class="text-emerald-300">"admin"</span> <span class="text-purple-400">and</span> payload.password == <span class="text-emerald-300">"123456"</span>:
+        <span class="text-purple-400">return</span> {
+            <span class="text-emerald-300">"status"</span>: <span class="text-emerald-300">"success"</span>,
+            <span class="text-emerald-300">"token"</span>: f<span class="text-emerald-300">"jwt.rest.{payload.usuario}.valid"</span>,
+            <span class="text-emerald-300">"user"</span>: {<span class="text-emerald-300">"id"</span>: 1, <span class="text-emerald-300">"nombre"</span>: <span class="text-emerald-300">"Administrador"</span>, <span class="text-emerald-300">"rol"</span>: <span class="text-emerald-300">"ADMIN"</span>}
+        }
+    <span class="text-purple-400">raise</span> <span class="text-yellow-300">HTTPException</span>(
+        status_code=status.HTTP_401_UNAUTHORIZED, 
+        detail=<span class="text-rose-400">"Credenciales invalidas"</span>
+    )
+
+<span class="text-slate-500"># Endpoint CRUD: GET /api/v1/usuarios/{id} (Idempotente y cacheable)</span>
+<span class="text-amber-300">@app.get</span>(<span class="text-emerald-300">"/api/v1/usuarios/{id_usuario}"</span>)
+<span class="text-blue-400">def</span> <span class="text-yellow-300">obtener_usuario</span>(id_usuario: <span class="text-blue-300">int</span>):
+    <span class="text-purple-400">return</span> {<span class="text-emerald-300">"id"</span>: id_usuario, <span class="text-emerald-300">"nombre"</span>: <span class="text-emerald-300">"Juan Perez"</span>, <span class="text-emerald-300">"rol"</span>: <span class="text-emerald-300">"DEV_LEAD"</span>}</pre>
+        </div>
+      </div>
+
+      <!-- PASO 2: CLIENTE FRONTEND -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-bold text-pink-400">Paso 2: Consumir la API desde el Frontend (JavaScript / Fetch)</span>
+          <span class="text-slate-500 text-[11px]">Client Implementation</span>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-200 overflow-x-auto">
+<pre><span class="text-blue-400">async function</span> <span class="text-yellow-300">autenticarUsuarioREST</span>(usuario, password) {
+  <span class="text-purple-400">try</span> {
+    <span class="text-blue-400">const</span> response = <span class="text-purple-400">await</span> <span class="text-yellow-300">fetch</span>(<span class="text-emerald-300">'/api/v1/auth/login'</span>, {
+      method: <span class="text-emerald-300">'POST'</span>,
+      headers: {
+        <span class="text-emerald-300">'Content-Type'</span>: <span class="text-emerald-300">'application/json'</span>,
+        <span class="text-emerald-300">'Accept'</span>: <span class="text-emerald-300">'application/json'</span>
+      },
+      body: JSON.<span class="text-yellow-300">stringify</span>({ usuario, password })
+    });
+
+    <span class="text-purple-400">if</span> (!response.ok) {
+      <span class="text-blue-400">const</span> errorData = <span class="text-purple-400">await</span> response.<span class="text-yellow-300">json</span>();
+      <span class="text-purple-400">throw new</span> <span class="text-yellow-300">Error</span>(errorData.detail || <span class="text-rose-400">'Error de autenticación'</span>);
+    }
+
+    <span class="text-blue-400">const</span> data = <span class="text-purple-400">await</span> response.<span class="text-yellow-300">json</span>();
+    <span class="text-slate-500">// Guardar token en memoria o almacenamiento seguro</span>
+    localStorage.<span class="text-yellow-300">setItem</span>(<span class="text-emerald-300">'auth_token'</span>, data.token);
+    console.log(<span class="text-emerald-300">'Sesión iniciada:'</span>, data.user.nombre);
+    <span class="text-purple-400">return</span> data;
+  } <span class="text-purple-400">catch</span> (err) {
+    console.error(<span class="text-rose-400">'Fallo la petición REST:'</span>, err.message);
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800 py-6 text-center text-xs text-slate-500 w-full px-4">
+    <p>Diferencias_sistemas_CRUD • Informe Técnico Arquitectónico: REST</p>
+  </footer>
+
+</body>
+</html>

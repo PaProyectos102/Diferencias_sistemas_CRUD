@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>gRPC: Informe Técnico y Arquitectura</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brandGrpc: '#3b82f6',
+            darkBg: '#0f172a'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased">
+
+  <!-- NAVBAR -->
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
+    <div class="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="/" class="w-9 h-9 rounded-lg bg-blue-500/20 border border-blue-500/40 flex items-center justify-center font-bold text-blue-400 text-lg hover:bg-blue-500/30 transition-all">
+          ←
+        </a>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span>
+            <h1 class="text-base sm:text-lg font-bold text-white tracking-tight">gRPC (Google Remote Procedure Call)</h1>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-blue-950 text-blue-400 border border-blue-800 font-semibold">Informe Técnico</span>
+          </div>
+          <p class="text-xs text-slate-400 hidden sm:block">Framework RPC binario de ultra alto rendimiento sobre HTTP/2</p>
+        </div>
+      </div>
+
+      <!-- SWITCHER DE PROTOCOLOS -->
+      <div class="flex items-center gap-2">
+        <a href="/" class="text-xs text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-1.5 rounded-lg transition-all hidden md:flex items-center gap-1.5">
+          <span>🏠</span> Laboratorio
+        </a>
+        <a href="/Informacion-de-REST" class="text-xs text-emerald-300 hover:text-white bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-800/60 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1">
+          <span>🟢</span> REST
+        </a>
+        <a href="/Informacion-de-GraphQL" class="text-xs text-pink-300 hover:text-white bg-pink-950/40 hover:bg-pink-900/50 border border-pink-800/60 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1">
+          <span>🟣</span> GraphQL
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="w-full px-4 sm:px-6 lg:px-8 py-8 flex-1 space-y-8 max-w-6xl mx-auto">
+
+    <!-- HERO BANNER -->
+    <div class="bg-gradient-to-r from-blue-950/50 via-slate-900 to-slate-900 border border-blue-800/50 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+      <div class="max-w-3xl space-y-3">
+        <span class="text-xs uppercase font-bold tracking-wider text-blue-400 bg-blue-950 border border-blue-800 px-3 py-1 rounded-md inline-block">
+          Paradigma Binario de Ultra Alto Rendimiento
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white">
+          ¿De qué trata gRPC y para qué se usa?
+        </h2>
+        <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+          <strong>gRPC</strong> es un framework RPC de código abierto desarrollado por <strong>Google</strong> (evolución de su protocolo interno <em>Stubby</em>). En lugar de enviar documentos de texto plano sobre URLs, el cliente invoca directamente funciones en el servidor remoto con <strong>serialización binaria Protocol Buffers</strong> y transporte obligatorio sobre <strong>HTTP/2</strong>.
+        </p>
+      </div>
+      <div class="absolute -right-6 -bottom-6 opacity-10 pointer-events-none text-9xl font-black text-blue-400">
+        RPC
+      </div>
+    </div>
+
+    <!-- SECCIÓN: ¿PARA QUÉ SE USA? -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+      <h3 class="text-lg font-bold text-white flex items-center gap-2">
+        <span class="text-blue-400">🎯</span> ¿Para qué se usa principalmente?
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-2">
+          <div class="text-blue-400 font-bold">1. Malla de Microservicios (East-West)</div>
+          <p class="text-slate-400 text-xs leading-relaxed">
+            Estándar para la comunicación interna entre microservicios (Kubernetes, Envoy, mTLS), donde cientos de llamadas internas deben resolverse en submilisegundos.
+          </p>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-2">
+          <div class="text-blue-400 font-bold">2. Dispositivos IoT y Redes Móviles</div>
+          <p class="text-slate-400 text-xs leading-relaxed">
+            La densidad extrema de bytes de Protobuf reduce el consumo energético del módem y la pérdida de paquetes en conexiones celulares inestables.
+          </p>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-2">
+          <div class="text-blue-400 font-bold">3. Streaming en Tiempo Real</div>
+          <p class="text-slate-400 text-xs leading-relaxed">
+            Sistemas financieros, telemetría y pipelines de datos que requieren streaming unidireccional o bidireccional sobre un único canal TCP sin reconexiones.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN: PRINCIPIOS ARQUITECTÓNICOS -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+      <h3 class="text-lg font-bold text-white flex items-center gap-2">
+        <span class="text-blue-400">🏛️</span> Principios Arquitectónicos Fundamentales
+      </h3>
+
+      <div class="space-y-4 text-sm text-slate-300">
+        <div class="border-l-2 border-blue-500 pl-4 py-1 space-y-1">
+          <span class="font-bold text-white text-base">1. Invocación de Procedimientos Remotos (RPC)</span>
+          <p class="text-xs text-slate-400">
+            Abandona el concepto de recursos sustantivos de REST. El cliente ejecuta funciones remotas como <code class="text-blue-300 bg-slate-950 px-2 py-0.5 rounded">authService.Login(request)</code> como si residieran en su propia memoria local.
+          </p>
+        </div>
+
+        <div class="border-l-2 border-blue-500 pl-4 py-1 space-y-1">
+          <span class="font-bold text-white text-base">2. Protocol Buffers (Protobuf) como IDL</span>
+          <p class="text-xs text-slate-400">
+            Utiliza archivos <code class="text-blue-400">.proto</code> estrictos para definir esquemas y servicios. El compilador <code class="text-slate-200">protoc</code> genera stubs tipados en más de 10 lenguajes (Go, Java, Python, C++, Rust, Node.js), detectando errores de tipos en compilación.
+          </p>
+        </div>
+
+        <div class="border-l-2 border-blue-500 pl-4 py-1 space-y-1">
+          <span class="font-bold text-white text-base">3. Serialización Binaria (TLV + Varint LEB128)</span>
+          <p class="text-xs text-slate-400">
+            Elimina por completo las cadenas de texto con nombres de campos. Cada dato se codifica con un tag numérico <code class="text-blue-300">(field_number &lt;&lt; 3) | wire_type</code> y compresión numérica variable, ahorrando hasta un 75% frente a JSON.
+          </p>
+        </div>
+
+        <div class="border-l-2 border-blue-500 pl-4 py-1 space-y-1">
+          <span class="font-bold text-white text-base">4. Transporte HTTP/2 Exclusivo y Multiplexación</span>
+          <p class="text-xs text-slate-400">
+            Múltiples llamadas viajan simultáneamente sobre una única conexión TCP sin bloqueo de cabecera (*Head-of-Line Blocking* a nivel de aplicación) y con compresión HPACK de cabeceras.
+          </p>
+        </div>
+
+        <div class="border-l-2 border-blue-500 pl-4 py-1 space-y-1">
+          <span class="font-bold text-white text-base">5. Trailers de gRPC-Web</span>
+          <p class="text-xs text-slate-400">
+            El estado final de la llamada se transmite como cabeceras posteriores de remolque (<code class="text-blue-400">grpc-status: 0</code> para éxito). En navegadores, gRPC-Web empaqueta estos trailers en un segundo frame con el flag <code class="text-blue-400">0x80</code>.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN: CÓMO SE CODEARÍA PARA QUE FUNCIONE (EJEMPLO COMPLETO) -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+      <div>
+        <span class="text-[11px] uppercase tracking-wider font-bold text-blue-400">Implementación de Código</span>
+        <h3 class="text-xl font-bold text-white flex items-center gap-2 mt-1">
+          <span>💻</span> ¿Cómo se codearía gRPC para que funcione?
+        </h3>
+        <p class="text-xs sm:text-sm text-slate-300 mt-1">
+          A continuación se muestra el código real y completo para implementar este servicio tanto en el <strong>Backend (Servidor gRPC)</strong> como en el <strong>Frontend (Cliente)</strong>:
+        </p>
+      </div>
+
+      <!-- PASO 1: CONTRATO PROTOBUF -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-bold text-blue-400">Paso 1: Definir el Contrato de Interfaz (<code class="text-slate-300">auth.proto</code>)</span>
+          <span class="text-slate-500 text-[11px]">IDL Estricto</span>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-blue-300 overflow-x-auto">
+<pre>syntax = "proto3";
+
+package auth;
+
+// Servicio de autenticación remota
+service AuthService {
+  rpc Login (LoginRequest) returns (LoginResponse);
+}
+
+// Mensaje de solicitud de login
+message LoginRequest {
+  string usuario = 1;   // Tag: (1 << 3) | 2 = 0x0a
+  string password = 2;  // Tag: (2 << 3) | 2 = 0x12
+}
+
+// Entidad de Usuario anidada
+message Usuario {
+  int32 id = 1;
+  string nombre = 2;
+  string rol = 3;
+}
+
+// Mensaje de respuesta
+message LoginResponse {
+  string token = 1;
+  Usuario user = 2;
+}</pre>
+        </div>
+      </div>
+
+      <!-- PASO 2: SERVIDOR BACKEND -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-bold text-emerald-400">Paso 2: Implementar el Servidor en Backend (Python con gRPC)</span>
+          <span class="text-slate-500 text-[11px]">Server Implementation</span>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-200 overflow-x-auto">
+<pre><span class="text-purple-400">import</span> grpc
+<span class="text-purple-400">from</span> concurrent <span class="text-purple-400">import</span> futures
+<span class="text-purple-400">import</span> auth_pb2, auth_pb2_grpc  <span class="text-slate-500"># Archivos generados automáticamente por protoc</span>
+
+<span class="text-blue-400">class</span> <span class="text-amber-300">AuthServiceServicer</span>(auth_pb2_grpc.AuthServiceServicer):
+    <span class="text-blue-400">def</span> <span class="text-yellow-300">Login</span>(self, request, context):
+        usuario = request.usuario
+        password = request.password
+
+        <span class="text-slate-500"># Validación de credenciales en base de datos</span>
+        <span class="text-purple-400">if</span> usuario == <span class="text-emerald-300">"admin"</span> <span class="text-purple-400">and</span> password == <span class="text-emerald-300">"123456"</span>:
+            user_msg = auth_pb2.Usuario(id=1, nombre=<span class="text-emerald-300">"Administrador"</span>, rol=<span class="text-emerald-300">"ADMIN"</span>)
+            token = f<span class="text-emerald-300">"jwt.grpc.{usuario}.valid"</span>
+            <span class="text-purple-400">return</span> auth_pb2.LoginResponse(token=token, user=user_msg)
+        <span class="text-purple-400">else</span>:
+            <span class="text-slate-500"># Retornar código de error gRPC estándar (UNAUTHENTICATED = 16)</span>
+            context.abort(grpc.StatusCode.UNAUTHENTICATED, <span class="text-rose-400">"Credenciales invalidas"</span>)
+
+<span class="text-blue-400">def</span> <span class="text-yellow-300">iniciar_servidor</span>():
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    auth_pb2_grpc.add_AuthServiceServicer_to_server(AuthServiceServicer(), server)
+    server.add_insecure_port(<span class="text-emerald-300">'[::]:50051'</span>)
+    server.start()
+    print(<span class="text-emerald-300">"Servidor gRPC corriendo en puerto 50051 sobre HTTP/2"</span>)
+    server.wait_for_termination()</pre>
+        </div>
+      </div>
+
+      <!-- PASO 3: CLIENTE FRONTEND (WEB / JS) -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-bold text-pink-400">Paso 3: Consumir desde el Cliente (JavaScript / gRPC-Web)</span>
+          <span class="text-slate-500 text-[11px]">Client Implementation</span>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-200 overflow-x-auto">
+<pre><span class="text-slate-500">// Opción A: Con el SDK oficial de gRPC-Web</span>
+<span class="text-purple-400">import</span> { AuthServiceClient } <span class="text-purple-400">from</span> <span class="text-emerald-300">'./auth_grpc_web_pb'</span>;
+<span class="text-purple-400">import</span> { LoginRequest } <span class="text-purple-400">from</span> <span class="text-emerald-300">'./auth_pb'</span>;
+
+<span class="text-blue-400">const</span> client = <span class="text-blue-400">new</span> <span class="text-yellow-300">AuthServiceClient</span>(<span class="text-emerald-300">'http://localhost:8000'</span>, <span class="text-purple-400">null</span>, <span class="text-purple-400">null</span>);
+
+<span class="text-blue-400">async function</span> <span class="text-yellow-300">autenticarConGrpcWeb</span>(usuario, password) {
+  <span class="text-blue-400">const</span> req = <span class="text-blue-400">new</span> <span class="text-yellow-300">LoginRequest</span>();
+  req.<span class="text-yellow-300">setUsuario</span>(usuario);
+  req.<span class="text-yellow-300">setPassword</span>(password);
+
+  client.<span class="text-yellow-300">login</span>(req, {}, (err, response) => {
+    <span class="text-purple-400">if</span> (err) {
+      console.error(<span class="text-rose-400">"Error gRPC:"</span>, err.code, err.message);
+      <span class="text-purple-400">return</span>;
+    }
+    console.log(<span class="text-emerald-300">"Login exitoso. Token:"</span>, response.<span class="text-yellow-300">getToken</span>());
+    console.log(<span class="text-emerald-300">"Usuario:"</span>, response.<span class="text-yellow-300">getUser</span>().<span class="text-yellow-300">getNombre</span>());
+  });
+}</pre>
+        </div>
+      </div>
+    </div>
+
+  <!-- SECCIÓN: ANÁLISIS DETALLADO: ¿QUÉ SIGNIFICA CADA BYTE EN gRPC-WEB? -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-7 shadow-xl space-y-6">
+      <div>
+        <span class="text-[11px] uppercase tracking-wider font-bold text-blue-400">Análisis Detallado</span>
+        <h3 class="text-xl font-bold text-white flex items-center gap-2 mt-1">
+          <span>🔬</span> ¿Qué significa cada byte en gRPC-Web?
+        </h3>
+        <p class="text-xs sm:text-sm text-slate-300 mt-1">
+          A continuación se presenta el desglose exacto de los bytes enviados en la llamada de autenticación para el usuario <strong class="text-blue-300">"admin"</strong> con contraseña <strong class="text-purple-300">"123456"</strong>:
+        </p>
+      </div>
+
+      <!-- VISOR DE TRAMA COMPLETA EN BYTES -->
+      <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 sm:p-5 space-y-3 font-mono">
+        <div class="text-[11px] text-slate-500">// Trama completa transmitida (Framing gRPC + Payload Protobuf):</div>
+        
+        <div class="flex flex-wrap items-center gap-2 text-xs text-center font-mono">
+          <!-- BYTE 0: COMPRESIÓN -->
+          <div class="bg-amber-950/80 border border-amber-600/60 rounded-lg p-2.5 text-amber-300 min-w-[75px]">
+            <span class="block font-bold text-sm">00</span>
+            <span class="text-[9px] text-amber-400/80 uppercase tracking-tighter">Compresión</span>
+          </div>
+
+          <!-- BYTES 1-4: LONGITUD BIG-ENDIAN -->
+          <div class="bg-amber-950/80 border border-amber-600/60 rounded-lg p-2.5 text-amber-300 min-w-[110px]">
+            <span class="block font-bold text-sm">00 00 00 11</span>
+            <span class="text-[9px] text-amber-400/80 uppercase tracking-tighter">Longitud (17 B)</span>
+          </div>
+
+          <!-- CAMPO 1: USUARIO -->
+          <div class="bg-blue-950/80 border border-blue-600/60 rounded-lg p-2.5 text-blue-300 min-w-[85px]">
+            <span class="block font-bold text-sm">0a</span>
+            <span class="text-[9px] text-blue-400/80 uppercase tracking-tighter">Tag 1 (Wire 2)</span>
+          </div>
+          <div class="bg-blue-950/80 border border-blue-600/60 rounded-lg p-2.5 text-blue-300 min-w-[70px]">
+            <span class="block font-bold text-sm">05</span>
+            <span class="text-[9px] text-blue-400/80 uppercase tracking-tighter">Len (5 B)</span>
+          </div>
+          <div class="bg-blue-950/80 border border-blue-600/60 rounded-lg p-2.5 text-blue-300 min-w-[110px]">
+            <span class="block font-bold text-sm">61 64 6d 69 6e</span>
+            <span class="text-[9px] text-blue-400/80 uppercase tracking-tighter">"admin"</span>
+          </div>
+
+          <!-- CAMPO 2: PASSWORD -->
+          <div class="bg-purple-950/80 border border-purple-600/60 rounded-lg p-2.5 text-purple-300 min-w-[85px]">
+            <span class="block font-bold text-sm">12</span>
+            <span class="text-[9px] text-purple-400/80 uppercase tracking-tighter">Tag 2 (Wire 2)</span>
+          </div>
+          <div class="bg-purple-950/80 border border-purple-600/60 rounded-lg p-2.5 text-purple-300 min-w-[70px]">
+            <span class="block font-bold text-sm">06</span>
+            <span class="text-[9px] text-purple-400/80 uppercase tracking-tighter">Len (6 B)</span>
+          </div>
+          <div class="bg-purple-950/80 border border-purple-600/60 rounded-lg p-2.5 text-purple-300 min-w-[120px]">
+            <span class="block font-bold text-sm">31 32 33 34 35 36</span>
+            <span class="text-[9px] text-purple-400/80 uppercase tracking-tighter">"123456"</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXPLICACIÓN TÉCNICA DE LOS BLOQUES -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+        <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-4 space-y-1.5">
+          <span class="font-bold text-amber-400 block text-sm">1. Framing de gRPC (5 bytes)</span>
+          <p class="text-slate-400 leading-relaxed">
+            El byte <code class="text-amber-300 bg-slate-900 px-1 py-0.5 rounded">00</code> indica que el payload no está comprimido. Los siguientes 4 bytes (<code class="text-amber-300 bg-slate-900 px-1 py-0.5 rounded">00 00 00 11</code>) son un entero Big-Endian de 32 bits que expresa la longitud exacta del Protobuf (17 bytes decimales).
+          </p>
+        </div>
+        <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-4 space-y-1.5">
+          <span class="font-bold text-blue-400 block text-sm">2. Campo 1: Usuario</span>
+          <p class="text-slate-400 leading-relaxed">
+            El byte <code class="text-blue-300 bg-slate-900 px-1 py-0.5 rounded">0a</code> resulta de la fórmula matemática <code class="text-slate-300">(1 &lt;&lt; 3) | 2</code> (campo 1, wire type 2). Sigue la longitud (<code class="text-blue-300 bg-slate-900 px-1 py-0.5 rounded">05</code>) y los 5 caracteres UTF-8 de <code class="text-slate-200">"admin"</code>.
+          </p>
+        </div>
+        <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-4 space-y-1.5">
+          <span class="font-bold text-purple-400 block text-sm">3. Campo 2: Password</span>
+          <p class="text-slate-400 leading-relaxed">
+            El byte <code class="text-purple-300 bg-slate-900 px-1 py-0.5 rounded">12</code> resulta de <code class="text-slate-300">(2 &lt;&lt; 3) | 2</code> (campo 2, wire type 2). Sigue la longitud (<code class="text-purple-300 bg-slate-900 px-1 py-0.5 rounded">06</code>) y los 6 caracteres ASCII de <code class="text-slate-200">"123456"</code>.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800 py-6 text-center text-xs text-slate-500 w-full px-4">
+    <p>Diferencias_sistemas_CRUD • Informe Técnico Arquitectónico: gRPC</p>
+  </footer>
+
+</body>
+</html>
